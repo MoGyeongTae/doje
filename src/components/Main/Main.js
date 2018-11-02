@@ -53,9 +53,15 @@ class Main extends PureComponent {
                         {boardlist}
                         </tbody>
                     </Table>
-                    <Link to="/add"><Button style={{float : "right"}}>작성</Button></Link>
-                    <Link to="/login"><Button style={{float : "right"}}>로그인</Button></Link>
-                    <Link to="/register"><Button style={{float : "right"}}>회원가입</Button></Link>
+                    {
+                        localStorage.getItem("token") &&
+                        <Link to="/add"><Button style={{float : "right"}}>작성</Button></Link>
+                    }
+                    {
+                        !localStorage.getItem("token") &&
+                        <Link to="/login"><Button style={{float : "right"}}>로그인</Button></Link> &&
+                        <Link to="/register"><Button style={{float : "right"}}>회원가입</Button></Link>
+                    }
                 </section>
             </div>
         )

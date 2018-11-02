@@ -164,6 +164,16 @@ app.post("/login", (req,res) => {
     })
 })
 
+app.post("/board/add", (req,res) => {
+    boardModel.find().sort({idx : -1}).limit(1)
+    .then(data => {
+        console.log(data);
+    })
+    catch(err => {
+        console.log(err);
+    })
+})
+
 app.listen(port, err => {
     console.log("Server is On Port %s", port);
 })
