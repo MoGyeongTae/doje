@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import "./Board.scss"
 import axios from 'axios';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import { ButtonGroup } from 'react-bootstrap';
 import { Button } from 'react-bootstrap'
@@ -37,6 +37,18 @@ class Board extends PureComponent {
         let commentData = await axios.get(`http://localhost:3001/comment/${this.props.match.params.idx}`);
 
         return [boardData, commentData]; 
+    }
+
+    deleteBoard = () => {
+        axios.post(`http://localhost:3001/board/delete/${this.props.match.params.idx}`)
+        .then(data => {
+            if(data.data.result) {
+                this.props.history.push("/");
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     render() {
@@ -78,11 +90,11 @@ class Board extends PureComponent {
                 <ButtonGroup style={{float:"right"}}>
                     <Link to="/"><Button>목록</Button></Link>
                     <Link to={`/modify/${this.props.match.params.idx}`}><Button>수정</Button></Link>
-                    <Link to={`/delete/${this.props.match.params.idx}`}><Button>삭제</Button></Link>
+                    <Button>삭제</Button>
                 </ButtonGroup>
             </section>
         )
     }
 }
 
-export default Board;
+export default withRouter(Board);

@@ -39,11 +39,16 @@ class Login extends PureComponent {
             console.log(data);
             if(data.data.result) {
                 localStorage.setItem("token", data.data.token);
+                localStorage.setItem("id", data.data.info.id);
+                localStorage.setItem("name", data.data.info.name);
                 this.props.history.push("/");
+            } else {
+                alert(data.data.msg);
+                this.setState({isLoading : false});
             }
         })
         .catch(err => {
-            
+            console.log(err);
         })
     }
 

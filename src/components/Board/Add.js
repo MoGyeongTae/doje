@@ -1,25 +1,21 @@
 import React, { PureComponent } from 'react';
 import "./Add.scss";
+import axios from 'axios'
 
 import { FormControl, Button } from 'react-bootstrap';
+import { Link, withRouter } from 'react-router-dom'
 
 class Add extends PureComponent {
     constructor(props) {
         super(props);
 
         this.state = {
-            writer : "",
-            title : "",
+            subject : "",
             content : ""
         }
     }
-
-    onWriterChange = e => {
-        this.setState({writer : e.target.value})
-    }
-
-    onTitleChange = e => {
-        this.setState({title : e.target.value})
+    onSubjectChange = e => {
+        this.setState({subject : e.target.value})
     }
 
     onContentChange = e => {
@@ -27,7 +23,17 @@ class Add extends PureComponent {
     }
 
     onWrite = e => {
+        let {subject, content} = this.state;
+        let writer = localStorage.getItem("name");
+        axios.post("http://localhost:3001/board/add", {writer : writer, subject : subject, content : content})
+        .then(data => {
+            if(data.data.result) {
+                this.props.history.push("/");
+            }
+        })
+        .catch(err => {
 
+        })
     }
 
     render() {
@@ -38,19 +44,19 @@ class Add extends PureComponent {
                     <table className="addForm">
                         <tr>
                             <th>작성자</th>
-                            <td><FormControl type="text"/></td>
+                            <td><FormControl type="text" readOnly value={localStorage.getItem("name")}/></td>
                         </tr>
                         <tr>
                             <th>제목</th>
-                            <td><FormControl type="text"/></td>
+                            <td><FormControl type="text" onChange={this.onSubjectChange}/></td>
                         </tr>
                         <tr>
                             <th>내용</th>
-                            <td><FormControl componentClass="textarea"/></td>
+                            <td><FormControl componentClass="textarea" onChange={this.onContentChange}/></td>
                         </tr>
                     </table>
                     <div className="buttonGroup">
-                        <Button>목록</Button>
+                        <Link to="/"><Button>목록</Button></Link>
                         <Button onClick={this.onWrite}>완료</Button>
                     </div>
                 </section>
@@ -59,4 +65,4 @@ class Add extends PureComponent {
     }
 }
 
-export default Add;
+export default withRouter(Add);

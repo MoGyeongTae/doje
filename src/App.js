@@ -20,7 +20,7 @@ import Main from './components/Main/Main';
 class App extends Component {
   render() {
     return (
-      <Router>
+      <Router className="container">
         <div className="App">
           <Header />
           <Switch>

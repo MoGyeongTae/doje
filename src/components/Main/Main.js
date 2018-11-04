@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import { Table } from 'react-bootstrap';
 import { Button } from 'react-bootstrap'
+import { runInThisContext } from 'vm';
 
 class Main extends PureComponent {
     constructor(props) {
@@ -25,6 +26,12 @@ class Main extends PureComponent {
         })
     }
 
+    logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        localStorage.removeItem("name");
+        this.forceUpdate();
+    }
     render() {
         const boardlist = this.state.board.map((item, idx) =>
             <tr key="idx">
@@ -55,12 +62,17 @@ class Main extends PureComponent {
                     </Table>
                     {
                         localStorage.getItem("token") &&
-                        <Link to="/add"><Button style={{float : "right"}}>작성</Button></Link>
+                        <div>
+                            <Link to="/add"><Button style={{float : "right"}}>작성</Button></Link>
+                            <Button style={{float : "right"}} onClick={this.logout}>로그아웃</Button>
+                        </div>
                     }
                     {
                         !localStorage.getItem("token") &&
-                        <Link to="/login"><Button style={{float : "right"}}>로그인</Button></Link> &&
-                        <Link to="/register"><Button style={{float : "right"}}>회원가입</Button></Link>
+                        <div>
+                            <Link to="/login"><Button style={{float : "right"}}>로그인</Button></Link>
+                            <Link to="/register"><Button style={{float : "right"}}>회원가입</Button></Link>
+                        </div>
                     }
                 </section>
             </div>

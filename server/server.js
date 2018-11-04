@@ -1,10 +1,11 @@
-let express = require("express");
-let app = express();
-let jwt = require("jwt-simple");
-let cors = require("cors");
-let mongoose = require("mongoose");
-let port = 3001 || process.ENV.port;
-let secret = "@MaSTerMgT@";
+const express = require("express");
+const app = express();
+const jwt = require("jwt-simple");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const port = 3001 || process.ENV.port;
+const secret = "@MaSTerMgT@";
+const moment = require("moment");
 
 app.use(cors());
 app.use(express.json());
@@ -145,7 +146,7 @@ app.post("/login", (req,res) => {
     .then(data => { 
         console.log(data);
         if(!data) {
-            res.send({result : false, msg : "없는 아이디입니다."});
+            res.send({result : false, msg : "없는 아이디거나 틀린 아이디입니다."});
             return;
         }
         let payload = {
@@ -156,7 +157,8 @@ app.post("/login", (req,res) => {
         let token = jwt.encode(payload, secret);
         res.json({
             result : 1,
-            token : token
+            token : token,
+            info : data
         })
     })
     .catch(err => {
@@ -167,9 +169,38 @@ app.post("/login", (req,res) => {
 app.post("/board/add", (req,res) => {
     boardModel.find().sort({idx : -1}).limit(1)
     .then(data => {
-        console.log(data);
+        let lastIdx = data[0].idx + 1;
+        let {writer, subject, content} = req.body;
+        
+        let time = moment().format("YYYY-MM-DD kk:mm:ss");
+
+        let board = new boardModel();
+        board.idx = lastIdx;
+        board.writer = writer;
+        board.subject = subject;
+        board.content = content;
+        board.date = time;
+        board.save()
+        .then(data => {
+            res.json({
+                result : true
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        })
     })
-    catch(err => {
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+app.post("/board/delete/:bidx", (req,res) => {
+    boardModel.findOne({idx : idx})
+    .then(data =>{
+
+    })
+    .catch(err => {
         console.log(err);
     })
 })
