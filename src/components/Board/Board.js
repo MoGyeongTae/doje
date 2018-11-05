@@ -18,32 +18,84 @@ class Board extends PureComponent {
 
         this.state = {
             board : {},
-            comment : []
+            comment : [],
+            commentInput : ""
         }
     }
 
     componentDidMount() {
-        this.getDatas()
-        .then(data => {
-            this.setState({
-                board : data[0].data,
-                comment : data[1].data
-            })
-        })
+        this.getDatas();
     }
 
     getDatas = async () => {
         let boardData = await axios.get(`http://localhost:3001/board/${this.props.match.params.idx}`);
         let commentData = await axios.get(`http://localhost:3001/comment/${this.props.match.params.idx}`);
 
-        return [boardData, commentData]; 
+        Promise.all([boardData, commentData])
+        .then(datas => {
+            this.setState({
+                board : datas[0].data,
+                comment  : datas[1].data
+            })
+        })
     }
 
     deleteBoard = () => {
-        axios.post(`http://localhost:3001/board/delete/${this.props.match.params.idx}`)
+        if(localStorage.getItem("id") && localStorage.getItem("id") == this.state.board.writer) {
+            axios.post(`http://localhost:3001/board/delete/${this.props.match.params.idx}`)
+            .then(data => {
+                if(data.data.result) {
+                    this.props.history.push("/");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        } else {
+            alert("자기거만 삭제가능");
+        }
+    } 
+
+    modifyCheck = () => {
+        if(localStorage.getItem("id") && localStorage.getItem("id") == this.state.board.writer ) {
+            this.props.history.push(`/modify/${this.props.match.params.idx}`);
+        } else {
+            alert("자기거만 수정가능");
+        }
+    }
+
+    commentChange = e => {
+        this.setState({
+            commentInput : e.target.value
+        })
+    }
+
+    writeComment = () => {
+        if(this.state.commentInput) {
+            axios.post(`http://localhost:3001/comment/add/${this.props.match.params.idx}`, {writer : localStorage.getItem("id"), content : this.state.commentInput})
+            .then(data => {
+                console.log(data)
+                if(data.data.result) {
+                    this.setState({
+                        commentInput : ""
+                    })
+                    this.getDatas();
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        } else {
+            alert("댓글을 입력");
+            return;
+        }
+    }
+
+    deleteComment = idx => {
+        axios.post(`http://localhost:3001/comment/delete/${idx}`)
         .then(data => {
             if(data.data.result) {
-                this.props.history.push("/");
+                this.getDatas();
             }
         })
         .catch(err => {
@@ -53,14 +105,21 @@ class Board extends PureComponent {
 
     render() {
         const commentlist = this.state.comment.map((item, idx) =>
-            <ListGroupItem className="comment">
+            <ListGroupItem className="comment" key={idx}>
                 <span>{item.writer}</span>
                 <span> / </span>
                 <span>{item.content}</span>
                 <span> / </span>
                 <span>{moment(item.date).format("YYYY-MM-DD kk:mm:ss")}</span>
                 <span> / </span>
-                <Link to="#">삭제</Link>
+                <Button style={{color : "blue"}} onClick={
+                    () => {
+                        if(localStorage.getItem("id") && localStorage.getItem("id") != item.writer) {
+                            alert("자기거만 삭제가능");
+                            return;
+                        }
+                        this.deleteComment(item.idx)}
+                    }>삭제</Button>
             </ListGroupItem>
         );
         return (
@@ -82,15 +141,15 @@ class Board extends PureComponent {
                     <p>댓글 작성</p>
                     <Form inline onSubmit={e => e.preventDefault()}>
                         <FormGroup>
-                            <FormControl type="text" />
+                            <FormControl type="text" onChange={this.commentChange}/>
                         </FormGroup>
-                        <Button>작성완료</Button>
+                        <Button onClick={this.writeComment}>작성완료</Button>
                     </Form>
                 </Well>
                 <ButtonGroup style={{float:"right"}}>
                     <Link to="/"><Button>목록</Button></Link>
-                    <Link to={`/modify/${this.props.match.params.idx}`}><Button>수정</Button></Link>
-                    <Button>삭제</Button>
+                    <Button onClick={this.modifyCheck}>수정</Button>
+                    <Button onClick={this.deleteBoard}>삭제</Button>
                 </ButtonGroup>
             </section>
         )

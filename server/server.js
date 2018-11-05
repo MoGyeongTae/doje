@@ -28,10 +28,6 @@ const userSchema = new mongoose.Schema({
         type : String,
         max : 15,
         required : true
-    },
-    name : {
-        type : String,
-        required : true
     }
 });
 
@@ -53,7 +49,7 @@ const boardSchema = new mongoose.Schema({
     },
     date : {
         type : Date,
-        default : Date.now
+        default : Date.now()
     }
 });
 
@@ -123,7 +119,6 @@ app.post("/register", (req,res) => {
             let user = new userModel();
             user.id = req.body.id;
             user.pw = req.body.pw;
-            user.name = req.body.name;
             user.save()
             .then(data => {
                 console.log(data);
@@ -169,11 +164,11 @@ app.post("/login", (req,res) => {
 app.post("/board/add", (req,res) => {
     boardModel.find().sort({idx : -1}).limit(1)
     .then(data => {
-        let lastIdx = data[0].idx + 1;
+        if(data[0].idx) var lastIdx = data[0].idx + 1;
+        else var lastIdx = 1;
         let {writer, subject, content} = req.body;
         
         let time = moment().format("YYYY-MM-DD kk:mm:ss");
-
         let board = new boardModel();
         board.idx = lastIdx;
         board.writer = writer;
@@ -196,9 +191,71 @@ app.post("/board/add", (req,res) => {
 })
 
 app.post("/board/delete/:bidx", (req,res) => {
-    boardModel.findOne({idx : idx})
+    boardModel.remove({idx : req.params.bidx})
     .then(data =>{
+        console.log(data);
+        res.json({
+            result : true
+        })
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
 
+app.post("/board/modify/:bidx", (req, res) => {
+    boardModel.update({idx : req.params.bidx}, {
+        subject : req.body.subject,
+        content : req.body.content
+    })
+    .then(data => {
+        console.log(data);
+        res.json({
+            result : true
+        })
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+app.post("/comment/add/:bidx", (req,res) => {
+    commentModel.find().sort({idx : -1}).limit(1)
+    .then(data => {
+        if(data[0].idx) var lastIdx = data[0].idx + 1;
+        else var lastIdx = 1;
+
+        console.log(lastIdx);
+        
+        let comment = new commentModel();
+        comment.idx = lastIdx;
+        comment.bidx = req.params.bidx;
+        comment.writer = req.body.writer;
+        comment.content = req.body.content;
+
+        comment.save()
+        .then(data => {
+            console.log(data);
+            res.json({
+                result : true
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        })       
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+app.post("/comment/delete/:idx", (req,res) => {
+    commentModel.remove({idx : req.params.idx})
+    .then(data => {
+        console.log(req.params.idx);
+        res.json({
+            result : true
+        })
     })
     .catch(err => {
         console.log(err);

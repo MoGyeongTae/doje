@@ -15,7 +15,6 @@ class Register extends PureComponent {
         this.state = {
             id : "",
             pw : "",
-            name : "",
             isLoading : false,
             errorMsg : ""
         }
@@ -29,18 +28,14 @@ class Register extends PureComponent {
         this.setState({pw : e.target.value});
     }
 
-    onNameChange = e => {
-        this.setState({name : e.target.value});
-    }
-
     onRegister = e => {
-        let {id, pw, name} = this.state;
-        if(!id || !pw || !name) {
+        let {id, pw} = this.state;
+        if(!id || !pw) {
             alert("전부 입력해주세요");
             return;
         }
         this.setState({isLoading : true});
-        axios.post("http://localhost:3001/register", {id : id, pw : pw, name : name})
+        axios.post("http://localhost:3001/register", {id : id, pw : pw})
         .then(data => {
             console.log(data)
             if(data.data.result) {
@@ -69,10 +64,6 @@ class Register extends PureComponent {
                         <FormGroup controlId="formPw">
                             비밀번호
                             <FormControl type="password" placeholder="Pw" onChange={this.onPwChange}/>
-                        </FormGroup>
-                        <FormGroup controlId="formName">
-                            이름
-                            <FormControl type="text" placeholder="Name" onChange={this.onNameChange}/>
                         </FormGroup>
                     </Form>
                     <Button bsStyle="info" block 

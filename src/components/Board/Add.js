@@ -24,7 +24,11 @@ class Add extends PureComponent {
 
     onWrite = e => {
         let {subject, content} = this.state;
-        let writer = localStorage.getItem("name");
+        let writer = localStorage.getItem("id");
+        if(!subject || !content) {
+            alert("전부입력");
+            return;
+        }
         axios.post("http://localhost:3001/board/add", {writer : writer, subject : subject, content : content})
         .then(data => {
             if(data.data.result) {
@@ -44,7 +48,7 @@ class Add extends PureComponent {
                     <table className="addForm">
                         <tr>
                             <th>작성자</th>
-                            <td><FormControl type="text" readOnly value={localStorage.getItem("name")}/></td>
+                            <td><FormControl type="text" readOnly value={localStorage.getItem("id")}/></td>
                         </tr>
                         <tr>
                             <th>제목</th>

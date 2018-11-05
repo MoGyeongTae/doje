@@ -40,7 +40,6 @@ class Login extends PureComponent {
             if(data.data.result) {
                 localStorage.setItem("token", data.data.token);
                 localStorage.setItem("id", data.data.info.id);
-                localStorage.setItem("name", data.data.info.name);
                 this.props.history.push("/");
             } else {
                 alert(data.data.msg);

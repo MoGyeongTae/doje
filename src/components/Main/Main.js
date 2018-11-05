@@ -6,7 +6,6 @@ import moment from 'moment';
 
 import { Table } from 'react-bootstrap';
 import { Button } from 'react-bootstrap'
-import { runInThisContext } from 'vm';
 
 class Main extends PureComponent {
     constructor(props) {
