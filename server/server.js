@@ -74,9 +74,9 @@ const commentSchema = new mongoose.Schema({
     }
 });
 
-let userModel = mongoose.model("User", userSchema);
-let boardModel = mongoose.model("Board", boardSchema);
-let commentModel = mongoose.model("Comment", commentSchema);
+let userModel = mongoose.model("user_tbl", userSchema);
+let boardModel = mongoose.model("board_tbl", boardSchema);
+let commentModel = mongoose.model("comment_tbl", commentSchema);
 
 app.get("/", (req, res) => {
     res.send("그걸 믿었음? 째트킥!")
